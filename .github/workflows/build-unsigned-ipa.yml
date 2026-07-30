@@ -1,0 +1,46 @@
+name: Build Unsigned IPA
+
+# Manually triggered build for people without a Mac: compiles FrameStep on
+# GitHub's macOS runner and uploads an unsigned .ipa. Sign and install it
+# yourself afterwards with a tool like Sideloadly or AltStore/AltServer,
+# using your own free Apple ID (never shared with this workflow).
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select latest available Xcode
+        run: |
+          LATEST=$(ls /Applications | grep '^Xcode_' | sort -V | tail -1)
+          sudo xcode-select -switch "/Applications/$LATEST"
+          xcodebuild -version
+
+      - name: Build unsigned .app
+        run: |
+          xcodebuild \
+            -project FrameStep/FrameStep.xcodeproj \
+            -scheme FrameStep \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package as .ipa (Payload/FrameStep.app)
+        run: |
+          set -eu
+          APP_PATH="build/Build/Products/Release-iphoneos/FrameStep.app"
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r FrameStep-unsigned.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FrameStep-unsigned-ipa
+          path: FrameStep-unsigned.ipa
