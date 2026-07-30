@@ -72,6 +72,12 @@ private struct FramePlayerContentView: View {
                 .font(.subheadline.monospacedDigit())
                 .foregroundStyle(.secondary)
 
+            if viewModel.isRefiningFrameTimeline {
+                Label("正確なフレーム位置を解析中…", systemImage: "gearshape.arrow.triangle.2.circlepath")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+
             Slider(
                 value: Binding(
                     get: { Double(viewModel.currentFrameIndex) },
