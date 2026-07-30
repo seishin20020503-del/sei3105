@@ -6,6 +6,7 @@ import sys
 
 from .chart import load_chart
 from .efficiency import compute_segment_efficiencies
+from .glove_tracker import extract_glove_trajectory
 from .hand_tracker import extract_hand_trajectories
 from .report import build_report
 from .timing import match_notes_to_touches
@@ -13,11 +14,48 @@ from .touch_detection import detect_touch_events
 from .trajectory import reference_trajectory
 
 
+def _parse_roi(value: str) -> tuple[int, int, int, int]:
+    parts = [int(p) for p in value.split(",")]
+    if len(parts) != 4:
+        raise argparse.ArgumentTypeError("--roi must be 'x,y,w,h'")
+    return parts[0], parts[1], parts[2], parts[3]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="maimai gameplay video hand-motion analyzer")
     parser.add_argument("video", help="path to gameplay video")
     parser.add_argument("--chart", help="path to JSON note chart for timing analysis")
     parser.add_argument("--out", default="report.md", help="output report path (markdown)")
+    parser.add_argument(
+        "--backend",
+        choices=["mediapipe", "glove"],
+        default="mediapipe",
+        help="'mediapipe' detects bare hands; 'glove' tracks an opaque glove as a color blob "
+        "(use when MediaPipe can't detect a gloved hand)",
+    )
+    parser.add_argument(
+        "--roi",
+        type=_parse_roi,
+        help="'x,y,w,h' pixel crop of just the touch panel (required for --backend glove)",
+    )
+    parser.add_argument(
+        "--glove-color",
+        choices=["dark", "light"],
+        default="dark",
+        help="glove color to look for (glove backend only)",
+    )
+    parser.add_argument(
+        "--glove-min-area",
+        type=float,
+        default=3000.0,
+        help="minimum contour area (px^2) to accept as the glove (glove backend only)",
+    )
+    parser.add_argument(
+        "--hand",
+        choices=["left", "right"],
+        default="left",
+        help="which hand the tracked glove blob represents (glove backend only)",
+    )
     parser.add_argument(
         "--landmark",
         type=int,
@@ -38,7 +76,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--plot-right", help="save right-hand trajectory plot to this path")
     args = parser.parse_args(argv)
 
-    data = extract_hand_trajectories(args.video, mirror=args.mirror)
+    if args.backend == "glove":
+        if not args.roi:
+            parser.error("--roi is required for --backend glove")
+        data = extract_glove_trajectory(
+            args.video,
+            roi=args.roi,
+            dark=(args.glove_color == "dark"),
+            min_area=args.glove_min_area,
+            hand=args.hand,
+        )
+    else:
+        data = extract_hand_trajectories(args.video, mirror=args.mirror)
     duration_sec = max(len(data.left), len(data.right), 1) / data.fps
 
     left_times, left_pos = reference_trajectory(data.left, args.landmark, data.width, data.height)
