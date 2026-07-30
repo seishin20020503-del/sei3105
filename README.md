@@ -30,12 +30,11 @@ FrameStep/
 1. macOS + Xcode 15 以降で `FrameStep/FrameStep.xcodeproj` を開く
 2. シミュレータまたは実機を選択して実行（実機テストには動画ファイルが必要です）
 
-## App Store 提出前に必要な作業（このリポジトリには含まれていません）
+## App Store 公開手順
 
-- Apple Developer Program のアカウントと証明書/プロビジョニングプロファイル
-- `Assets.xcassets/AppIcon.appiconset` への実際のアプリアイコン画像（1024x1024）
-- `PRODUCT_BUNDLE_IDENTIFIER`（現在は仮の `com.framestep.app`）を自分のチームのIDに変更
-- App Store Connect 上でのアプリ登録、スクリーンショット、説明文、プライバシー情報の入力
-- 実機での動作確認（大きい動画/長時間動画でのパフォーマンス確認を推奨）
+具体的な手順は [`APP_STORE_SUBMISSION.md`](./APP_STORE_SUBMISSION.md) にまとめています。
+アプリ説明文などの下書きは [`APP_STORE_METADATA.md`](./APP_STORE_METADATA.md)、
+プライバシーポリシーの下書きは [`PRIVACY_POLICY.md`](./PRIVACY_POLICY.md) を参照してください。
 
-これらはApple Developerアカウントでの操作が必要なため、コード側の実装のみを用意しています。
+Apple Developer Programへの登録、Xcodeでの署名・アーカイブ・アップロード、App Store Connectでの
+審査提出は、Apple IDでの認証や金銭・法的手続きを伴うためご自身のMacで実行する必要があります。
