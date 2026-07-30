@@ -6,6 +6,12 @@ name: Build Unsigned IPA
 # using your own free Apple ID (never shared with this workflow).
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - claude/ios-video-filter-frame-player-2oco2w
+    paths:
+      - "FrameStep/**"
+      - ".github/workflows/build-unsigned-ipa.yml"
 
 jobs:
   build:
