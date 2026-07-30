@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maimai-motion"
+version = "0.1.0"
+description = "Analyze maimai gameplay video hand movement and report improvement points"
+requires-python = ">=3.10"
+dependencies = [
+    "opencv-python>=4.9",
+    "mediapipe>=0.10",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+maimai-motion = "maimai_motion.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

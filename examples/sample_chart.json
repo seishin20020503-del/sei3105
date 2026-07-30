@@ -1,0 +1,8 @@
+[
+  {"time": 1.000, "hand": "left", "label": "tap"},
+  {"time": 1.500, "hand": "right", "label": "tap"},
+  {"time": 2.000, "hand": "left", "label": "tap"},
+  {"time": 2.250, "hand": "right", "label": "tap"},
+  {"time": 2.500, "hand": "left", "label": "tap"},
+  {"time": 3.000, "hand": "either", "label": "both hands"}
+]
